@@ -45,8 +45,8 @@ type appDirector struct {
 // Strategy priority (first legal result is used):
 // - `rd` querysting parameter
 // - `X-Auth-Request-Redirect` header
-// - `X-Forwarded-(Proto|Host|Uri)` headers (when ReverseProxy mode is enabled)
-// - `X-Forwarded-(Proto|Host)` if `Uri` has the ProxyPath (i.e. /oauth2/*)
+// - `X-Forwarded-(Proto|Host|Prefix|Uri)` headers (when ReverseProxy mode is enabled)
+// - `X-Forwarded-(Proto|Host|Prefix)` if `Uri` has the ProxyPath (i.e. /oauth2/*)
 // - `X-Forwarded-Uri` direct URI path (when ReverseProxy mode is enabled)
 // - `req.URL.RequestURI` if not under the ProxyPath (i.e. /oauth2/*)
 // - `/`

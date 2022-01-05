@@ -30,16 +30,19 @@ func (a *appDirector) getXAuthRequestRedirect(req *http.Request) string {
 }
 
 // getXForwardedHeadersRedirect handles these getAppRedirect strategies:
-// - `X-Forwarded-(Proto|Host|Uri)` headers (when ReverseProxy mode is enabled)
-// - `X-Forwarded-(Proto|Host)` if `Uri` has the ProxyPath (i.e. /oauth2/*)
+// - `X-Forwarded-(Proto|Host|Prefix|Uri)` headers (when ReverseProxy mode is enabled)
+// - `X-Forwarded-(Proto|Host|Prefix)` if `Uri` has the ProxyPath (i.e. /oauth2/*)
 func (a *appDirector) getXForwardedHeadersRedirect(req *http.Request) string {
 	if !requestutil.IsForwardedRequest(req) {
 		return ""
 	}
 
 	uri := requestutil.GetRequestURI(req)
+	prefix := requestutil.GetRequestPrefix(req)
 	if a.hasProxyPrefix(uri) {
-		uri = requestutil.GetRequestPrefix(req)
+		uri = prefix
+	} else if prefix != "/" {
+		uri = prefix + uri
 	}
 
 	redirect := fmt.Sprintf(

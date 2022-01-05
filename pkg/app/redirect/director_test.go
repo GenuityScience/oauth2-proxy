@@ -73,6 +73,18 @@ var _ = Describe("Director Suite", func() {
 			validator:        testValidator(true),
 			expectedRedirect: "https://a-service.example.com/foo/bar",
 		}),
+		Entry("Proxied request with headers (including prefix), outside of ProxyPrefix, redirects to proxied URL", getRedirectTableInput{
+			requestURL: "https://oauth.example.com/foo/bar",
+			headers: map[string]string{
+				"X-Forwarded-Proto": "https",
+				"X-Forwarded-Host":  "a-service.example.com",
+				"X-Forwarded-Uri":   "/foo/bar",
+				"X-Forwarded-Prefix":   "/stripped-prefix",
+			},
+			reverseProxy:     true,
+			validator:        testValidator(true),
+			expectedRedirect: "https://a-service.example.com/stripped-prefix/foo/bar",
+		}),
 		Entry("Non-proxied request with spoofed headers, wouldn't redirect", getRedirectTableInput{
 			requestURL: "https://oauth.example.com/foo?bar",
 			headers: map[string]string{
@@ -94,6 +106,18 @@ var _ = Describe("Director Suite", func() {
 			reverseProxy:     true,
 			validator:        testValidator(true),
 			expectedRedirect: "https://a-service.example.com/",
+		}),
+		Entry("Proxied request with headers (including prefix), under ProxyPrefix, redirects to  prefix", getRedirectTableInput{
+			requestURL: "https://oauth.example.com" + testProxyPrefix + "/foo/bar",
+			headers: map[string]string{
+				"X-Forwarded-Proto": "https",
+				"X-Forwarded-Host":  "a-service.example.com",
+				"X-Forwarded-Uri":   testProxyPrefix + "/foo/bar",
+				"X-Forwarded-Prefix":   "/stripped-prefix",
+			},
+			reverseProxy:     true,
+			validator:        testValidator(true),
+			expectedRedirect: "https://a-service.example.com/stripped-prefix",
 		}),
 		Entry("Proxied request with port, under ProxyPrefix, redirects to  root", getRedirectTableInput{
 			requestURL: "https://oauth.example.com" + testProxyPrefix + "/foo/bar",

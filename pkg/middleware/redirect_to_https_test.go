@@ -206,5 +206,31 @@ var _ = Describe("RedirectToHTTPS suite", func() {
 			expectedBody:     permanentRedirectBody("https://external.example.com"),
 			expectedLocation: "https://external.example.com",
 		}),
+		Entry("without TLS with an X-Forwarded-Prefix header", &requestTableInput{
+			requestString: "http://internal.example.com",
+			useTLS:        false,
+			headers: map[string]string{
+				"X-Forwarded-Proto": "HTTP",
+				"X-Forwarded-Host":  "external.example.com",
+				"X-Forwarded-Prefix":  "/stripped-prefix",
+			},
+			reverseProxy:     true,
+			expectedStatus:   308,
+			expectedBody:     permanentRedirectBody("https://external.example.com/stripped-prefix"),
+			expectedLocation: "https://external.example.com/stripped-prefix",
+		}),
+		Entry("without TLS with an X-Forwarded-Prefix header and subpath", &requestTableInput{
+			requestString: "http://internal.example.com/subpath",
+			useTLS:        false,
+			headers: map[string]string{
+				"X-Forwarded-Proto": "HTTP",
+				"X-Forwarded-Host":  "external.example.com",
+				"X-Forwarded-Prefix":  "/stripped-prefix",
+			},
+			reverseProxy:     true,
+			expectedStatus:   308,
+			expectedBody:     permanentRedirectBody("https://external.example.com/stripped-prefix/subpath"),
+			expectedLocation: "https://external.example.com/stripped-prefix/subpath",
+		}),
 	)
 })

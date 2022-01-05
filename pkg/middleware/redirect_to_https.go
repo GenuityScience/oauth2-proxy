@@ -40,6 +40,10 @@ func redirectToHTTPS(httpsPort string, next http.Handler) http.Handler {
 		// Set the scheme to HTTPS
 		targetURL.Scheme = httpsScheme
 
+		prefix := requestutil.GetRequestPrefix(req)
+		if prefix != "/" {
+			targetURL.Path = prefix + targetURL.Path
+		}
 		// Set the Host in case the targetURL still does not have one
 		// or it isn't X-Forwarded-Host aware
 		targetURL.Host = requestutil.GetRequestHost(req)
