@@ -39,7 +39,7 @@ func (a *appDirector) getXForwardedHeadersRedirect(req *http.Request) string {
 
 	uri := requestutil.GetRequestURI(req)
 	if a.hasProxyPrefix(uri) {
-		uri = "/"
+		uri = requestutil.GetRequestPrefix(req)
 	}
 
 	redirect := fmt.Sprintf(

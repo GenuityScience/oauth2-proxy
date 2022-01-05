@@ -10,6 +10,7 @@ const (
 	XForwardedProto = "X-Forwarded-Proto"
 	XForwardedHost  = "X-Forwarded-Host"
 	XForwardedURI   = "X-Forwarded-Uri"
+	XForwardedPrefix = "X-Forwarded-Prefix"
 )
 
 // GetRequestProto returns the request scheme or X-Forwarded-Proto if present
@@ -21,6 +22,17 @@ func GetRequestProto(req *http.Request) string {
 	}
 	return proto
 }
+
+// GetRequestPrefix returns the root prefix ('/') or X-Forwarded-Prefix if present
+// and the request is proxied.
+func GetRequestPrefix(req *http.Request) string {
+	prefix := req.Header.Get(XForwardedPrefix)
+	if !IsProxied(req) || prefix == "" {
+		prefix = "/"
+	}
+	return prefix
+}
+
 
 // GetRequestHost returns the request host header or X-Forwarded-Host if
 // present and the request is proxied.
